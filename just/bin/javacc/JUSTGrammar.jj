@@ -1,0 +1,318 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.17+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  JDK_VERSION = "1.5";
+  static = true;
+}
+
+PARSER_BEGIN(JUST)
+
+package javacc;
+
+public class JUST
+{
+  public static void main(String args []) throws ParseException
+  {
+    JUST parser = new JUST(System.in);
+    while (true)
+    {
+      System.out.println("Reading from standard input...");
+      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");
+      try
+      {
+        switch (JUST.one_line())
+        {
+          case 0 : 
+          System.out.println("OK.");
+          break;
+          case 1 : 
+          System.out.println("Goodbye.");
+          break;
+          default : 
+          break;
+        }
+      }
+      catch (Exception e)
+      {
+        System.out.println("NOK.");
+        System.out.println(e.getMessage());
+        JUST.ReInit(System.in);
+      }
+      catch (Error e)
+      {
+        System.out.println("Oops.");
+        System.out.println(e.getMessage());
+        break;
+      }
+    }
+  }
+}
+
+PARSER_END(JUST)
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+}
+
+TOKEN : /* OPERATORS */
+{
+  < PLUS : "+" >
+| < MINUS : "-" >
+| < MULTIPLY : "*" >
+| < DIVIDE : "/" >
+| < ASSIGN : "=" >
+| < EQUALS : "==" >
+| < NQ : "!=" > /*Not Equals*/
+| < GT : ">" > /*Greater than*/
+| < GET : ">=" > /*Greater than or equal*/
+| < LT : "<" > /*Lesser than*/
+| < LET : "<=" > /*Lesser than or equal*/
+| < NOT : "!" >
+| < OR: "||" >
+| < AND: "&&" >
+
+}
+
+TOKEN : /*punctuation character*/
+{
+  < LEFTBRACKET : "(" >
+| < RIGHTBRACKET : ")" >
+| < LEFTCURLYBRACKET: "{" >
+| < RIGHTTCURLYBRACKET: "}" >
+| < LEFTSQUAREBRACKET: "[" >
+| < RIGHTSQUAREBRACKET: "]" >
+| < COLON : "," >
+| < SEMICOLON : ";">
+}
+
+TOKEN : /*keywords*/
+{
+  < PROGRAM : "program" >
+| < VOID: "void" >
+| < INT : "int" >
+| < BOOL: "boolean" >
+| < BYREF: "byref" >
+| < RETURN: "return" >
+| < IF: "if" >
+| < ELSE: "else" >
+| < WHILE: "while" >
+}
+
+
+TOKEN [IGNORE_CASE]:
+{
+  < IDENT : (< NUMBER >|< WORD >)(< NUMBER >|< WORD >)* > 
+| < NUMBER : (< DIGIT >)+ >
+| < #DIGIT : [ "0"-"9" ] >
+| < WORD : (< LETTER >)+ >
+| < #LETTER: ["a"-"z", "A"-"Z"] > 
+}
+
+int one_line() :
+{}
+{
+  CompilationUnit() ";"/*Startpunkt für die Kompilierung*/
+  {
+    return 0;
+  }
+| ";"
+  {
+    return 1;
+  }
+}
+/*Ab hier einfach die Regeln aus den Folien Abschreiben:
+CompilationUnit ="program" ident "{" Definition "}".
+Definition={ VarDef| FuncDef}.
+VarDef=Type ident[ Init] ";".
+Init="=" number.
+Type="void" | "int" | "boolean".
+FuncDef=FuncHeadBlock.
+FuncHead=Type ident "(" [ FormParList] ")".
+FormParList=["byref"] Type ident{"," ["byref"] Type ident}.
+Block="{" { VarDef| Stat} "}".
+Stat=AssignStat| CallStat| IfStat| WhileStat| ReturnStat| Block | ";".
+
+
+AssignStat=ident "=" Expr";".
+CallStat=Call ";".
+Call=ident "(" [ ActParList] ")".
+ActParList=Expr{ "," Expr}.
+IfStat="if" "(" Expr ")" Stat [ "else" Stat ].
+WhileStat="while" "(" Expr")" Stat.
+ReturnStat="return" [ Expr] ";" .
+Expr=OrExpr.
+OrExpr=AndExpr{ "||" AndExpr}.
+AndExpr=RelExpr{ "&&" RelExpr}.
+RelExpr=SimpleExpr[ ("==" | "!=" | "<" | "<=" | ">" | ">=") SimpleExpr].
+SimpleExpr=["+" | "-"] Term { ("+" | "-") Term }.
+Term=NotFact{ ("*" | "/") NotFact}.
+NotFact=["!"] Fact.
+Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
+
+void CompilationUnit() :
+{}
+{
+ < PROGRAM > < IDENT > < LEFTCURLYBRACKET > Definition() < RIGHTTCURLYBRACKET >
+}
+
+void Definition() :
+{}
+{
+ (	LOOKAHEAD(2)/*vorrausschauen 3 ist vorschlag von cc*/
+   VarDef() | FuncDef()
+ )*
+}
+
+void VarDef() :
+{}
+{
+Type() < IDENT >[Init()]< SEMICOLON >
+}
+
+void Init() :
+{}
+{
+  < ASSIGN >< NUMBER >
+}
+
+void Type() :
+{}
+{
+  < VOID >< INT >< BOOL >
+}
+
+void FuncDef() :
+{}
+{
+  FuncHead() Block()
+}
+
+void FuncHead() :
+{}
+{
+  Type() < IDENT > < LEFTBRACKET >[FormParList()]< RIGHTBRACKET >
+}
+
+void FormParList() :
+{}
+{
+    formPar()   (< COLON > formPar()   )*
+}
+
+void formPar() :/*musste aufgeteilt werden, sonst gabs fehler*/
+{}
+{
+   [< BYREF >] Type() < IDENT >
+}
+
+void Block() :
+{}
+{
+< LEFTCURLYBRACKET>( VarDef() | Stat() )*< RIGHTTCURLYBRACKET>
+}
+
+void Stat() :
+{}
+{ LOOKAHEAD(2)/*vorraussschauen (Vorschlag war 2)*/
+AssignStat() | CallStat() | IfStat() |  WhileStat() | ReturnStat()| Block()| < SEMICOLON >
+}
+
+void AssignStat() :
+{}
+{
+< IDENT >< ASSIGN >Expr()< SEMICOLON >
+}
+
+void CallStat() :
+{}
+{
+Call()< SEMICOLON >
+}
+
+void Call():
+{}
+{
+  < IDENT >  < LEFTBRACKET >[ActParList()]< RIGHTBRACKET >
+}
+
+void ActParList():
+{}
+{
+  Expr()( < COLON >Expr())*
+}
+
+void IfStat() :
+{}
+{
+< IF >< LEFTBRACKET >Expr()< RIGHTBRACKET >Stat()
+[LOOKAHEAD(2) /*Vorrausschauen (Vorschlag war 2)*/
+< ELSE >Stat()
+]
+}
+
+void WhileStat() :
+{}
+{
+< WHILE >< LEFTBRACKET >Expr()< RIGHTBRACKET >Stat()
+}
+
+void ReturnStat() :
+{}
+{
+< RETURN >Expr()< SEMICOLON >
+}
+
+void Expr() :
+{}
+{
+  OrExpr()
+}
+
+void OrExpr() :
+{}
+{
+  AndExpr() (< OR > AndExpr())*
+}
+
+void AndExpr() :
+{}
+{
+  RelExpr()(< AND >RelExpr())*
+}
+
+void RelExpr():
+{}
+{
+  SimpleExpr()[(< EQUALS >|<  NQ >| < GT >|< GET >|< LT >|< LET > )SimpleExpr()]
+}
+
+void SimpleExpr() :
+{}
+{
+  [< PLUS >|< MINUS >] Term() (< PLUS >|< MINUS > Term())*
+}
+
+void Term():
+{}
+{
+  NotFact() ((< MULTIPLY >|< DIVIDE >) NotFact())*
+}
+
+void NotFact():
+{}
+{
+  [< NOT >]Fact()
+}
+
+void Fact():
+{}
+{
+  < NUMBER >|< IDENT >[< LEFTBRACKET >[ActParList()]< RIGHTBRACKET >]|< LEFTBRACKET >Expr()< RIGHTBRACKET >
+}
+
