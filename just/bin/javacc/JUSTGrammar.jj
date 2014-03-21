@@ -11,15 +11,28 @@ PARSER_BEGIN(JUST)
 
 package javacc;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+
 public class JUST
 {
   public static void main(String args []) throws ParseException
   {
-    JUST parser = new JUST(System.in);
+    FileInputStream fis = null;
+	try {
+		fis = new FileInputStream(new File("./just_sources/test1.just"));
+	} catch (FileNotFoundException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+	
+    JUST parser = new JUST(fis);
+    
     while (true)
     {
-      System.out.println("Reading from standard input...");
-      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");
+      System.out.println("Reading from input...");
       try
       {
         switch (JUST.one_line())
@@ -184,7 +197,7 @@ void Init() :
 void Type() :
 {}
 {
-  < VOID >< INT >< BOOL >
+  < VOID >|< INT >|< BOOL >
 }
 
 void FuncDef() :
@@ -202,7 +215,7 @@ void FuncHead() :
 void FormParList() :
 {}
 {
-    formPar()   (< COLON > formPar()   )*
+    formPar()   ([< COLON >] formPar()   )*
 }
 
 void formPar() :/*musste aufgeteilt werden, sonst gabs fehler*/
