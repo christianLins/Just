@@ -73,15 +73,15 @@ public interface JUSTConstants {
   /** RegularExpression Id. */
   int WHILE = 35;
   /** RegularExpression Id. */
-  int IDENT = 36;
+  int TRUE = 36;
   /** RegularExpression Id. */
-  int NUMBER = 37;
+  int FALSE = 37;
   /** RegularExpression Id. */
-  int DIGIT = 38;
+  int NUMBER = 38;
   /** RegularExpression Id. */
-  int WORD = 39;
+  int IDENT = 39;
   /** RegularExpression Id. */
-  int LETTER = 40;
+  int WORD = 40;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -124,11 +124,11 @@ public interface JUSTConstants {
     "\"if\"",
     "\"else\"",
     "\"while\"",
-    "<IDENT>",
+    "\"true\"",
+    "\"false\"",
     "<NUMBER>",
-    "<DIGIT>",
+    "<IDENT>",
     "<WORD>",
-    "<LETTER>",
   };
 
 }

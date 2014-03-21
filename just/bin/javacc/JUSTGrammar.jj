@@ -115,17 +115,18 @@ TOKEN : /*keywords*/
 | < IF: "if" >
 | < ELSE: "else" >
 | < WHILE: "while" >
+| < TRUE: "true" >
+| < FALSE: "false" >
 }
 
+TOKEN : { < NUMBER : (["0"-"9"])+ > }
 
-TOKEN [IGNORE_CASE]:
+TOKEN :
 {
-  < IDENT : (< NUMBER >|< WORD >)(< NUMBER >|< WORD >)* > 
-| < NUMBER : (< DIGIT >)+ >
-| < #DIGIT : [ "0"-"9" ] >
-| < WORD : (< LETTER >)+ >
-| < #LETTER: ["a"-"z", "A"-"Z"] > 
+  < IDENT : (< NUMBER >|< WORD >)(< NUMBER >|< WORD >)* >
+| < WORD : (["a"-"z", "A"-"Z"])+ >
 }
+
 
 int one_line() :
 {}
@@ -177,7 +178,7 @@ void CompilationUnit() :
 void Definition() :
 {}
 {
- (	LOOKAHEAD(2)/*vorrausschauen 3 ist vorschlag von cc*/
+ (	LOOKAHEAD(3)/*vorrausschauen 3 ist vorschlag von cc*/
    VarDef() | FuncDef()
  )*
 }
@@ -188,10 +189,15 @@ void VarDef() :
 Type() < IDENT >[Init()]< SEMICOLON >
 }
 
+void TruthVal() :
+{}
+{
+  < TRUE > | < FALSE >}
+
 void Init() :
 {}
 {
-  < ASSIGN >< NUMBER >
+  < ASSIGN > (< NUMBER > | TruthVal())
 }
 
 void Type() :
@@ -272,9 +278,8 @@ void IfStat() :
 void WhileStat() :
 {}
 {
-< WHILE >< LEFTBRACKET >Expr()< RIGHTBRACKET >Stat()
+< WHILE >< LEFTBRACKET >Expr()< RIGHTBRACKET > Stat()
 }
-
 void ReturnStat() :
 {}
 {
