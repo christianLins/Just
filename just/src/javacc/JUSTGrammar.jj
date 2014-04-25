@@ -21,8 +21,10 @@ public class JUST
   public static void main(String args []) throws ParseException
   {
     FileInputStream fis = null;
+    File file = new File("./just_sources/test1.just");
 	try {
-		fis = new FileInputStream(new File("./just_sources/test1.just"));
+		fis = new FileInputStream(file);
+
 	} catch (FileNotFoundException e1) {
 		// TODO Auto-generated catch block
 		e1.printStackTrace();
@@ -30,9 +32,10 @@ public class JUST
 	
     JUST parser = new JUST(fis);
     
-    while (true)
-    {
+    //while (true)
+    //{
       System.out.println("Reading from input...");
+      System.out.println(file.getName());
       try
       {
         switch (JUST.one_line())
@@ -57,9 +60,9 @@ public class JUST
       {
         System.out.println("Oops.");
         System.out.println(e.getMessage());
-        break;
+        //break;
       }
-    }
+    //}
   }
 }
 
@@ -131,43 +134,12 @@ TOKEN :
 int one_line() :
 {}
 {
-  CompilationUnit() ";"/*Startpunkt für die Kompilierung*/
+  CompilationUnit() //";"/*Startpunkt für die Kompilierung*/
   {
     return 0;
   }
-| ";"
-  {
-    return 1;
-  }
+
 }
-/*Ab hier einfach die Regeln aus den Folien Abschreiben:
-CompilationUnit ="program" ident "{" Definition "}".
-Definition={ VarDef| FuncDef}.
-VarDef=Type ident[ Init] ";".
-Init="=" number.
-Type="void" | "int" | "boolean".
-FuncDef=FuncHeadBlock.
-FuncHead=Type ident "(" [ FormParList] ")".
-FormParList=["byref"] Type ident{"," ["byref"] Type ident}.
-Block="{" { VarDef| Stat} "}".
-Stat=AssignStat| CallStat| IfStat| WhileStat| ReturnStat| Block | ";".
-
-
-AssignStat=ident "=" Expr";".
-CallStat=Call ";".
-Call=ident "(" [ ActParList] ")".
-ActParList=Expr{ "," Expr}.
-IfStat="if" "(" Expr ")" Stat [ "else" Stat ].
-WhileStat="while" "(" Expr")" Stat.
-ReturnStat="return" [ Expr] ";" .
-Expr=OrExpr.
-OrExpr=AndExpr{ "||" AndExpr}.
-AndExpr=RelExpr{ "&&" RelExpr}.
-RelExpr=SimpleExpr[ ("==" | "!=" | "<" | "<=" | ">" | ">=") SimpleExpr].
-SimpleExpr=["+" | "-"] Term { ("+" | "-") Term }.
-Term=NotFact{ ("*" | "/") NotFact}.
-NotFact=["!"] Fact.
-Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
 
 void CompilationUnit() :
 {}

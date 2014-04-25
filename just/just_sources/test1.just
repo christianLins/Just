@@ -1,6 +1,6 @@
 program EmJavaPrg {
 	int globalVal;
-	int doIt  ( int aParam) {
+	int doIt ( int aParam) {
 		boolean b = true;
 		if (b) {
 			int i = 12;

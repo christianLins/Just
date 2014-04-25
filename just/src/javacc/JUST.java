@@ -10,8 +10,10 @@ public class JUST implements JUSTConstants {
   public static void main(String args []) throws ParseException
   {
     FileInputStream fis = null;
+    File file = new File("./just_sources/test1.just");
         try {
-                fis = new FileInputStream(new File("./just_sources/test1.just"));
+                fis = new FileInputStream(file);
+
         } catch (FileNotFoundException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -19,9 +21,10 @@ public class JUST implements JUSTConstants {
 
     JUST parser = new JUST(fis);
 
-    while (true)
-    {
+    //while (true)
+    //{
       System.out.println("Reading from input...");
+      System.out.println(file.getName());
       try
       {
         switch (JUST.one_line())
@@ -46,58 +49,17 @@ public class JUST implements JUSTConstants {
       {
         System.out.println("Oops.");
         System.out.println(e.getMessage());
-        break;
+        //break;
       }
-    }
+    //}
   }
 
   static final public int one_line() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case PROGRAM:
-      CompilationUnit();
-      jj_consume_token(SEMICOLON);
+    CompilationUnit();
     {if (true) return 0;}
-      break;
-    case SEMICOLON:
-      jj_consume_token(SEMICOLON);
-    {if (true) return 1;}
-      break;
-    default:
-      jj_la1[0] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
     throw new Error("Missing return statement in function");
   }
 
-/*Ab hier einfach die Regeln aus den Folien Abschreiben:
-CompilationUnit ="program" ident "{" Definition "}".
-Definition={ VarDef| FuncDef}.
-VarDef=Type ident[ Init] ";".
-Init="=" number.
-Type="void" | "int" | "boolean".
-FuncDef=FuncHeadBlock.
-FuncHead=Type ident "(" [ FormParList] ")".
-FormParList=["byref"] Type ident{"," ["byref"] Type ident}.
-Block="{" { VarDef| Stat} "}".
-Stat=AssignStat| CallStat| IfStat| WhileStat| ReturnStat| Block | ";".
-
-
-AssignStat=ident "=" Expr";".
-CallStat=Call ";".
-Call=ident "(" [ ActParList] ")".
-ActParList=Expr{ "," Expr}.
-IfStat="if" "(" Expr ")" Stat [ "else" Stat ].
-WhileStat="while" "(" Expr")" Stat.
-ReturnStat="return" [ Expr] ";" .
-Expr=OrExpr.
-OrExpr=AndExpr{ "||" AndExpr}.
-AndExpr=RelExpr{ "&&" RelExpr}.
-RelExpr=SimpleExpr[ ("==" | "!=" | "<" | "<=" | ">" | ">=") SimpleExpr].
-SimpleExpr=["+" | "-"] Term { ("+" | "-") Term }.
-Term=NotFact{ ("*" | "/") NotFact}.
-NotFact=["!"] Fact.
-Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
   static final public void CompilationUnit() throws ParseException {
     jj_consume_token(PROGRAM);
     jj_consume_token(IDENT);
@@ -116,7 +78,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         ;
         break;
       default:
-        jj_la1[1] = jj_gen;
+        jj_la1[0] = jj_gen;
         break label_1;
       }
       if (jj_2_1(3)) {
@@ -129,7 +91,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
           FuncDef();
           break;
         default:
-          jj_la1[2] = jj_gen;
+          jj_la1[1] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -145,7 +107,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
       Init();
       break;
     default:
-      jj_la1[3] = jj_gen;
+      jj_la1[2] = jj_gen;
       ;
     }
     jj_consume_token(SEMICOLON);
@@ -160,7 +122,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
       jj_consume_token(FALSE);
       break;
     default:
-      jj_la1[4] = jj_gen;
+      jj_la1[3] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -177,7 +139,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
       TruthVal();
       break;
     default:
-      jj_la1[5] = jj_gen;
+      jj_la1[4] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -195,7 +157,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
       jj_consume_token(BOOL);
       break;
     default:
-      jj_la1[6] = jj_gen;
+      jj_la1[5] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -218,7 +180,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
       FormParList();
       break;
     default:
-      jj_la1[7] = jj_gen;
+      jj_la1[6] = jj_gen;
       ;
     }
     jj_consume_token(RIGHTBRACKET);
@@ -237,7 +199,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         ;
         break;
       default:
-        jj_la1[8] = jj_gen;
+        jj_la1[7] = jj_gen;
         break label_2;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -245,7 +207,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         jj_consume_token(COLON);
         break;
       default:
-        jj_la1[9] = jj_gen;
+        jj_la1[8] = jj_gen;
         ;
       }
       formPar();
@@ -258,7 +220,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
       jj_consume_token(BYREF);
       break;
     default:
-      jj_la1[10] = jj_gen;
+      jj_la1[9] = jj_gen;
       ;
     }
     Type();
@@ -282,7 +244,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         ;
         break;
       default:
-        jj_la1[11] = jj_gen;
+        jj_la1[10] = jj_gen;
         break label_3;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -300,7 +262,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         Stat();
         break;
       default:
-        jj_la1[12] = jj_gen;
+        jj_la1[11] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -332,7 +294,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         jj_consume_token(SEMICOLON);
         break;
       default:
-        jj_la1[13] = jj_gen;
+        jj_la1[12] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -364,7 +326,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
       ActParList();
       break;
     default:
-      jj_la1[14] = jj_gen;
+      jj_la1[13] = jj_gen;
       ;
     }
     jj_consume_token(RIGHTBRACKET);
@@ -379,7 +341,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         ;
         break;
       default:
-        jj_la1[15] = jj_gen;
+        jj_la1[14] = jj_gen;
         break label_4;
       }
       jj_consume_token(COLON);
@@ -428,7 +390,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         ;
         break;
       default:
-        jj_la1[16] = jj_gen;
+        jj_la1[15] = jj_gen;
         break label_5;
       }
       jj_consume_token(OR);
@@ -445,7 +407,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         ;
         break;
       default:
-        jj_la1[17] = jj_gen;
+        jj_la1[16] = jj_gen;
         break label_6;
       }
       jj_consume_token(AND);
@@ -482,14 +444,14 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         jj_consume_token(LET);
         break;
       default:
-        jj_la1[18] = jj_gen;
+        jj_la1[17] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       SimpleExpr();
       break;
     default:
-      jj_la1[19] = jj_gen;
+      jj_la1[18] = jj_gen;
       ;
     }
   }
@@ -506,13 +468,13 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         jj_consume_token(MINUS);
         break;
       default:
-        jj_la1[20] = jj_gen;
+        jj_la1[19] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       break;
     default:
-      jj_la1[21] = jj_gen;
+      jj_la1[20] = jj_gen;
       ;
     }
     Term();
@@ -524,7 +486,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         ;
         break;
       default:
-        jj_la1[22] = jj_gen;
+        jj_la1[21] = jj_gen;
         break label_7;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -536,7 +498,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         Term();
         break;
       default:
-        jj_la1[23] = jj_gen;
+        jj_la1[22] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -553,7 +515,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         ;
         break;
       default:
-        jj_la1[24] = jj_gen;
+        jj_la1[23] = jj_gen;
         break label_8;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -564,7 +526,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
         jj_consume_token(DIVIDE);
         break;
       default:
-        jj_la1[25] = jj_gen;
+        jj_la1[24] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -578,7 +540,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
       jj_consume_token(NOT);
       break;
     default:
-      jj_la1[26] = jj_gen;
+      jj_la1[25] = jj_gen;
       ;
     }
     Fact();
@@ -604,13 +566,13 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
           ActParList();
           break;
         default:
-          jj_la1[27] = jj_gen;
+          jj_la1[26] = jj_gen;
           ;
         }
         jj_consume_token(RIGHTBRACKET);
         break;
       default:
-        jj_la1[28] = jj_gen;
+        jj_la1[27] = jj_gen;
         ;
       }
       break;
@@ -620,7 +582,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
       jj_consume_token(RIGHTBRACKET);
       break;
     default:
-      jj_la1[29] = jj_gen;
+      jj_la1[28] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -645,32 +607,6 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
     try { return !jj_3_3(); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(2, xla); }
-  }
-
-  static private boolean jj_3_3() {
-    if (jj_scan_token(ELSE)) return true;
-    if (jj_3R_11()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_21() {
-    if (jj_scan_token(IF)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_15() {
-    if (jj_3R_21()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_18() {
-    if (jj_3R_24()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_25() {
-    if (jj_scan_token(IDENT)) return true;
-    return false;
   }
 
   static private boolean jj_3R_14() {
@@ -701,13 +637,13 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
     return false;
   }
 
-  static private boolean jj_3R_17() {
-    if (jj_3R_23()) return true;
+  static private boolean jj_3R_19() {
+    if (jj_scan_token(ASSIGN)) return true;
     return false;
   }
 
-  static private boolean jj_3R_19() {
-    if (jj_scan_token(ASSIGN)) return true;
+  static private boolean jj_3R_17() {
+    if (jj_3R_23()) return true;
     return false;
   }
 
@@ -782,6 +718,32 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
     return false;
   }
 
+  static private boolean jj_3_3() {
+    if (jj_scan_token(ELSE)) return true;
+    if (jj_3R_11()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_21() {
+    if (jj_scan_token(IF)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_15() {
+    if (jj_3R_21()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_18() {
+    if (jj_3R_24()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_25() {
+    if (jj_scan_token(IDENT)) return true;
+    return false;
+  }
+
   static private boolean jj_initialized_once = false;
   /** Generated Token Manager. */
   static public JUSTTokenManager token_source;
@@ -794,7 +756,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
   static private Token jj_scanpos, jj_lastpos;
   static private int jj_la;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[30];
+  static final private int[] jj_la1 = new int[29];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -802,10 +764,10 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0xc000000,0x70000000,0x70000000,0x200,0x0,0x0,0x70000000,0xf0000000,0xf2000000,0x2000000,0x80000000,0x74200000,0x74200000,0x4200000,0x90060,0x2000000,0x20000,0x40000,0xfc00,0xfc00,0x60,0x60,0x60,0x60,0x180,0x180,0x10000,0x90060,0x80000,0x80000,};
+      jj_la1_0 = new int[] {0x70000000,0x70000000,0x200,0x0,0x0,0x70000000,0xf0000000,0xf2000000,0x2000000,0x80000000,0x74200000,0x74200000,0x4200000,0x90060,0x2000000,0x20000,0x40000,0xfc00,0xfc00,0x60,0x60,0x60,0x60,0x180,0x180,0x10000,0x90060,0x80000,0x80000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x30,0x70,0x0,0x0,0x0,0x0,0x0,0x8b,0x8b,0x8b,0xc0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc0,0x0,0xc0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x30,0x70,0x0,0x0,0x0,0x0,0x0,0x8b,0x8b,0x8b,0xc0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc0,0x0,0xc0,};
    }
   static final private JJCalls[] jj_2_rtns = new JJCalls[3];
   static private boolean jj_rescan = false;
@@ -829,7 +791,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -844,7 +806,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -862,7 +824,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -873,7 +835,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -890,7 +852,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -900,7 +862,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1017,7 +979,7 @@ Fact=number| ident["(" [ ActParList] ")" ]| "(" Expr")".*/
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 30; i++) {
+    for (int i = 0; i < 29; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
