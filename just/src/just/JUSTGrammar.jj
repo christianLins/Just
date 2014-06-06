@@ -9,15 +9,30 @@ options
 
 PARSER_BEGIN(JUST)
 
-package javacc;
+package just;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import just.semantic.Namelist;
+import just.semantic.Symboltable;
+import just.semantic.Symbol.*;
+import just.semantic.*;
+import just.codegen.*;
+import just.codegen.structure.*;
+import just.codegen.references.*;
+import just.codegen.structure.writer.ClassWriter;
+import just.codegen.structure.writer.XmlWriter;
 
 public class JUST
 {
+  private static Namelist namelist;
+  private static Symboltable symboltable;
+  private static Codegen codegen;
+  private static JustClass justClass;
+  private static ClassWriter writer;
+  
   public static void main(String args []) throws ParseException
   {
     FileInputStream fis = null;
@@ -29,8 +44,15 @@ public class JUST
 		// TODO Auto-generated catch block
 		e1.printStackTrace();
 	}
+
+	symboltable = Symboltable.getInstance();
+	namelist = Namelist.getInstance();
+	codegen = new Codegen();
+	justClass = new JustClass();
+	writer = new XmlWriter();
 	
-    JUST parser = new JUST(fis);
+	JUST parser = new JUST(fis);
+    
     
     //while (true)
     //{
@@ -41,13 +63,14 @@ public class JUST
         switch (JUST.one_line())
         {
           case 0 : 
-          System.out.println("OK.");
-          break;
+	          System.out.println("OK.");
+	          writer.write(justClass);
+	          break;
           case 1 : 
-          System.out.println("Goodbye.");
-          break;
+	          System.out.println("Goodbye.");
+	          break;
           default : 
-          break;
+          	break;
         }
       }
       catch (Exception e)
@@ -63,6 +86,8 @@ public class JUST
         //break;
       }
     //}
+
+     System.out.println(symboltable.toString());
   }
 }
 
@@ -142,9 +167,26 @@ int one_line() :
 }
 
 void CompilationUnit() :
-{}
 {
- < PROGRAM > < IDENT > < LEFTCURLYBRACKET > Definition() < RIGHTTCURLYBRACKET >
+	Symbol sy;
+	Reference classRef;
+}
+{
+ < PROGRAM >
+ {
+    }
+ token = < IDENT >
+ {
+    sy = namelist.insert(token.image, Kind.progKind);
+    symboltable.insert(sy);
+    symboltable.enterScope("program " + token.image);
+    
+    classRef = justClass.addClassReference(sy);
+ }
+ < LEFTCURLYBRACKET > Definition()
+ {	symboltable.leaveScope();
+ }
+ < RIGHTTCURLYBRACKET >
 }
 
 void Definition() :
@@ -156,9 +198,20 @@ void Definition() :
 }
 
 void VarDef() :
-{}
 {
-Type() < IDENT >[Init()]< SEMICOLON >
+ Type type;
+ Token token;
+ Symbol sy;
+}
+{
+type = type()
+token=< IDENT >
+{ sy = namelist.insert(token.image, Symbol.Kind.varKind);
+ symboltable.insert(sy);
+ Descriptor desc = codegen.newDescriptor(sy);
+ codegen.load(desc);
+}
+[Init()]< SEMICOLON >
 }
 
 void TruthVal() :
@@ -172,34 +225,76 @@ void Init() :
   < ASSIGN > (< NUMBER > | TruthVal())
 }
 
-void Type() :
-{}
+Type type() :
 {
-  < VOID >|< INT >|< BOOL >
+}
+{
+  (
+    < VOID >
+    {
+      return Type.voidType;
+    }
+  | < INT >
+    {
+      return Type.intType;
+    }
+  | < BOOL >
+    {
+      return Type.boolType;
+    }
+  )
 }
 
+
 void FuncDef() :
-{}
+{
+  	
+}
 {
   FuncHead() Block()
+  {	symboltable.leaveScope();
+  }
 }
 
 void FuncHead() :
-{}
 {
-  Type() < IDENT > < LEFTBRACKET >[FormParList()]< RIGHTBRACKET >
+    Type type;
+	Token token;
+	Symbol sy;
+}
+{
+  type = type()
+  token=< IDENT >
+  {	sy = namelist.insert(token.image, Kind.funcKind);
+	symboltable.insert(sy);
+	symboltable.enterScope(token.image);
+  }
+  < LEFTBRACKET >[FormParList()]< RIGHTBRACKET >
 }
 
 void FormParList() :
-{}
+{
+  Token token;
+  Symbol sy;
+}
 {
     formPar()   ([< COLON >] formPar()   )*
 }
 
 void formPar() :/*musste aufgeteilt werden, sonst gabs fehler*/
-{}
 {
-   [< BYREF >] Type() < IDENT >
+  Type type;
+  Token token;
+  Symbol sy;
+}
+{
+   [< BYREF >]
+   type = type()
+   token=< IDENT >
+   {
+    sy = namelist.insert(token.image, Kind.parKind);
+    symboltable.insert(sy);
+  }
 }
 
 void Block() :
@@ -250,12 +345,20 @@ void IfStat() :
 void WhileStat() :
 {}
 {
-< WHILE >< LEFTBRACKET >Expr()< RIGHTBRACKET > Stat()
+< WHILE >< LEFTBRACKET >Expr()< RIGHTBRACKET >
+{ symboltable.enterScope("while");
+}
+Stat()
+{ symboltable.leaveScope();
+}
 }
 void ReturnStat() :
 {}
 {
-< RETURN >Expr()< SEMICOLON >
+< RETURN >Expr()
+{
+  codegen.emit1(Opcode.IRETURN);}
+< SEMICOLON >
 }
 
 void Expr() :
@@ -267,13 +370,21 @@ void Expr() :
 void OrExpr() :
 {}
 {
-  AndExpr() (< OR > AndExpr())*
+  AndExpr()
+  (< OR > AndExpr()
+	  {		codegen.emit1(Opcode.IOR);
+	  }
+  )*
 }
 
 void AndExpr() :
 {}
 {
-  RelExpr()(< AND >RelExpr())*
+  RelExpr()(< AND >RelExpr()
+	 {
+		codegen.emit1(Opcode.IAND);
+	 }
+  )*
 }
 
 void RelExpr():
@@ -285,19 +396,47 @@ void RelExpr():
 void SimpleExpr() :
 {}
 {
-  [< PLUS >|< MINUS >] Term() (< PLUS >|< MINUS > Term())*
+  [< PLUS >
+	 {
+		codegen.emit1(Opcode.IADD);
+	 }
+  |< MINUS >
+	 {
+		codegen.emit1(Opcode.ISUB);
+	 }
+  ] Term() (< PLUS >
+	 {
+		codegen.emit1(Opcode.IADD);
+	 }
+  |< MINUS >
+	 {
+		codegen.emit1(Opcode.ISUB);
+	 }
+  Term())*
 }
 
 void Term():
 {}
 {
-  NotFact() ((< MULTIPLY >|< DIVIDE >) NotFact())*
+  NotFact() ((< MULTIPLY >
+	 {
+		codegen.emit1(Opcode.IMUL);
+	 }
+  |< DIVIDE >
+	 {
+		codegen.emit1(Opcode.IDIV);
+	 }
+  ) NotFact())*
 }
 
 void NotFact():
 {}
 {
-  [< NOT >]Fact()
+  [< NOT >
+	 {
+		codegen.emit1(Opcode.INEG);
+	 }
+  ]Fact()
 }
 
 void Fact():
